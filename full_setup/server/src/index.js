@@ -12,11 +12,20 @@ const schema = gql`
     users: [User!]
     user(id: ID!): User
     company: Company
+
+    messages: [Message!]!
+    message(id: ID!): Message
   }
 
   type User {
     id: ID!
     username: String!
+    messages: [Message!]
+  }
+  type Message {
+    id: ID!
+    text: String!
+    user: User!
   }
 
   type Company {
@@ -25,24 +34,37 @@ const schema = gql`
   }
 `;
 
+let messages = {
+  1: {
+    id: "1",
+    text: "Hello Word",
+    userId: "1",
+  },
+  2: {
+    id: "2",
+    text: "Bye World",
+    userId: "2",
+  },
+};
+
 let users = {
   1: {
     id: "1",
-    username: "Rovin Wieruch",
+    username: "Daniel Dolan",
+    messageIds: [1],
   },
   2: {
     id: "2",
     username: "Dave Davids",
+    messageIds: [2],
   },
 };
-
-const me = users[1];
 
 //The Resolver is agnostic to the data source.
 //For instance, data is hardcoded to resolve the 'me' field.
 const resolvers = {
   Query: {
-    me: () => {
+    me: (parent, args, { me }) => {
       return me;
     },
     user: (parent, { id }) => {
@@ -57,12 +79,33 @@ const resolvers = {
         yearFounded: 2014,
       };
     },
+    messages: () => {
+      return Object.values(messages);
+    },
+    message: (parent, { id }) => {
+      return messages[id];
+    },
+  },
+  User: {
+    messages: (user) => {
+      return Object.values(messages).filter(
+        (message) => message.userId === user.id
+      );
+    },
+  },
+  Message: {
+    user: (message) => {
+      return users[message.userId];
+    },
   },
 };
 
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
+  context: {
+    me: users[1],
+  },
 });
 
 server.applyMiddleware({ app, path: "/graphql" });
