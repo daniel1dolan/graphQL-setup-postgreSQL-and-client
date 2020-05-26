@@ -143,6 +143,9 @@ const resolvers = {
   },
 };
 
+//The server has the type definitions, resolvers, and context
+//attached to it. In the example, we provide a hard-types context
+//which mimics a user.
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
@@ -151,6 +154,7 @@ const server = new ApolloServer({
   },
 });
 
+//The middleware makes the api accessible through a /graphql path.
 server.applyMiddleware({ app, path: "/graphql" });
 
 app.listen({ port: 8000 }, () => {
