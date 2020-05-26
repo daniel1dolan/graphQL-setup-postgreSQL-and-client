@@ -7,6 +7,11 @@ const app = express();
 
 app.use(cors());
 
+//The schema defines what type of queries can be made,
+//the arguments and argument scalar types that can be sent, and
+//the type of data that will be sent back.
+//There are queries, mutations, and subscriptions requests that can
+//be made to the GraphQl API/
 const schema = gql`
   type Query {
     me: User
@@ -41,6 +46,7 @@ const schema = gql`
   }
 `;
 
+//The messages would come from a database in a resolver or cache.
 let messages = {
   1: {
     id: "1",
@@ -54,6 +60,8 @@ let messages = {
   },
 };
 
+//The users would be an example of something that comes
+//from a database through a resolver.
 let users = {
   1: {
     id: "1",
