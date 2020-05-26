@@ -22,7 +22,11 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
   User.associate = function (models) {
-    User.hasMany(models.Message, { onDelete: "CASCADE" });
+    User.hasMany(
+      models.Message,
+      { onDelete: "CASCADE" },
+      { foreignKey: "UserID" }
+    );
     // associations can be defined here
   };
   User.findByLogin = async (login) => {

@@ -4,9 +4,8 @@ const { ApolloServer, gql } = require("apollo-server-express");
 
 const schema = require("./schema");
 const resolvers = require("./resolvers");
-const model = require("./models");
-
-const db = require("../models");
+const models = require("./models");
+const sequelize = models.sequelize;
 const { v4: uuidv4 } = require("uuid");
 
 const app = express();
@@ -19,28 +18,60 @@ app.use(cors());
 const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
-  context: {
-    model,
-    me: model.users[1],
-  },
+  context: async () => ({
+    models,
+    me: await models.User.findByLogin("rwieruch"),
+  }),
 });
 
 //The middleware makes the api accessible through a /graphql path.
 server.applyMiddleware({ app, path: "/graphql" });
 
-const createUsersWithMessages = async () => {
-  await db.Message.create({
-    id: uuidv4(),
-    text: "Published the Road to learn React",
-  });
-  await db.Message.create({
-    id: uuidv4(),
-    text: "Happy to release ...",
-  });
-};
+const eraseDatabaseOnSync = true;
 
-createUsersWithMessages().then(() => {
+sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
+  if (eraseDatabaseOnSync) {
+    createUsersWithMessages();
+  }
+
   app.listen({ port: 8000 }, () => {
     console.log("Apollo server listening on http://localhost:8000/graphql");
   });
 });
+
+const createUsersWithMessages = async () => {
+  await models.User.create(
+    {
+      id: uuidv4(),
+      username: "rwieruch",
+      messages: [
+        {
+          id: uuidv4(),
+          text: "Published the Road to learn React",
+        },
+      ],
+    },
+    {
+      include: [models.Message],
+    }
+  );
+  await models.User.create(
+    {
+      id: uuidv4(),
+      username: "ddavids",
+      messages: [
+        {
+          id: uuidv4(),
+          text: "Happy to release ...",
+        },
+        {
+          id: uuidv4(),
+          text: "Published a complete ...",
+        },
+      ],
+    },
+    {
+      include: [models.Message],
+    }
+  );
+};

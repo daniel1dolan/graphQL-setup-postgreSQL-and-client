@@ -15,11 +15,14 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
+      UserId: {
+        type: DataTypes.STRING,
+      },
     },
     {}
   );
   Message.associate = function (models) {
-    Message.belongsTo(models.User);
+    Message.belongsTo(models.User, { foreignKey: "UserID" });
     // associations can be defined here
   };
   return Message;
