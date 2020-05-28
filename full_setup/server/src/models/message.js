@@ -7,6 +7,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
         allowNull: false,
+        validate: {
+          notEmpty: {
+            args: true,
+            msg: "There was an error with unique id creation.",
+          },
+        },
       },
       text: {
         type: DataTypes.STRING,

@@ -7,13 +7,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         primaryKey: true,
+        validate: {
+          notEmpty: {
+            args: true,
+            msg: "There was a problem with unique id creation.",
+          },
+        },
       },
       username: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
         validate: {
-          notEmpty: true,
+          notEmpty: {
+            args: true,
+            msg: "A username is required.",
+          },
         },
       },
       email: DataTypes.STRING,
