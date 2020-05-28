@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { ApolloServer, gql } = require("apollo-server-express");
+const { ApolloServer } = require("apollo-server-express");
 require("dotenv").config();
 
 const schema = require("./schema");
