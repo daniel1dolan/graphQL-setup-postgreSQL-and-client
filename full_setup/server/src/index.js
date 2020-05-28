@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { ApolloServer, gql } = require("apollo-server-express");
+require("dotenv").config();
 
 const schema = require("./schema");
 const resolvers = require("./resolvers");
@@ -32,6 +33,7 @@ const server = new ApolloServer({
   context: async () => ({
     models,
     me: await models.User.findByLogin("rwieruch"),
+    secret: process.env.SECRET,
   }),
 });
 
@@ -55,6 +57,8 @@ const createUsersWithMessages = async () => {
     {
       id: uuidv4(),
       username: "rwieruch",
+      email: "hello@robin.com",
+      password: "rwieruch",
       messages: [
         {
           id: uuidv4(),
@@ -70,6 +74,8 @@ const createUsersWithMessages = async () => {
     {
       id: uuidv4(),
       username: "ddavids",
+      email: "hello@david.com",
+      password: "ddavids",
       messages: [
         {
           id: uuidv4(),

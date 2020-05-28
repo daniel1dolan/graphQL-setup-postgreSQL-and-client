@@ -1,4 +1,7 @@
 "use strict";
+
+const bcrypt = require("bcrypt");
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "User",
@@ -25,8 +28,23 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          isEmail: true,
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+          len: [7, 42],
+        },
+      },
     },
     {}
   );
@@ -49,5 +67,13 @@ module.exports = (sequelize, DataTypes) => {
     }
     return user;
   };
+  User.beforeCreate(async (user) => {
+    user.password = await user.generatePasswordHash();
+  });
+  User.prototype.generatePasswordHash = async function () {
+    const saltRounds = 10;
+    return await bcrypt.hash(this.password, saltRounds);
+  };
+
   return User;
 };
