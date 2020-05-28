@@ -1,6 +1,9 @@
 module.exports = {
   Query: {
     me: async (parent, args, { models, me }) => {
+      if (!me) {
+        return null;
+      }
       return await models.User.findByPk(me.id);
     },
     user: async (parent, { id }, { models }) => {

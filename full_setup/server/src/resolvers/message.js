@@ -17,7 +17,11 @@ module.exports = {
         text,
         UserId: me.id,
       };
-      return await models.Message.create(message);
+      try {
+        return await models.Message.create(message);
+      } catch (error) {
+        throw new Error(error);
+      }
     },
     deleteMessage: async (parent, { id }, { models }) => {
       return await models.Message.destroy({ where: { id } });
