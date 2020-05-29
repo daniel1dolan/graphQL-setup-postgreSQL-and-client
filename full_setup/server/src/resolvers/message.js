@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const { ForbiddenError } = require("apollo-server");
-const { isAuthenticated } = require("./authorization");
+const { isAuthenticated, isMessageOwner } = require("./authorization");
 const { combineResolvers } = require("graphql-resolvers");
 
 module.exports = {
@@ -29,9 +29,13 @@ module.exports = {
         }
       }
     ),
-    deleteMessage: async (parent, { id }, { models }) => {
-      return await models.Message.destroy({ where: { id } });
-    },
+    deleteMessage: combineResolvers(
+      isAuthenticated,
+      isMessageOwner,
+      async (parent, { id }, { models }) => {
+        return await models.Message.destroy({ where: { id } });
+      }
+    ),
     updateMessage: async (parent, { id, text }, { models }) => {
       return await models.Message.findByPk(id).then((result) => {
         result.text = text;
