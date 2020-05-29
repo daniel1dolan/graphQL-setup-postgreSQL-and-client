@@ -1,4 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
+const { ForbiddenError } = require("apollo-server");
+const { isAuthenticated } = require("./authorization");
+const { combineResolvers } = require("graphql-resolvers");
 
 module.exports = {
   Query: {
@@ -10,19 +13,22 @@ module.exports = {
     },
   },
   Mutation: {
-    createMessage: async (parent, { text }, { me, models }) => {
-      const id = uuidv4();
-      const message = {
-        id,
-        text,
-        UserId: me.id,
-      };
-      try {
-        return await models.Message.create(message);
-      } catch (error) {
-        throw new Error(error);
+    createMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { text }, { me, models }) => {
+        const id = uuidv4();
+        const message = {
+          id,
+          text,
+          UserId: me.id,
+        };
+        try {
+          return await models.Message.create(message);
+        } catch (error) {
+          throw new Error(error);
+        }
       }
-    },
+    ),
     deleteMessage: async (parent, { id }, { models }) => {
       return await models.Message.destroy({ where: { id } });
     },

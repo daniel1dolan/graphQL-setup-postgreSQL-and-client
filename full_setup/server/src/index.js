@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const { ApolloServer } = require("apollo-server-express");
+const { ApolloServer, AuthenticationError } = require("apollo-server-express");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 const schema = require("./schema");
 const resolvers = require("./resolvers");
@@ -12,6 +13,18 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 
 app.use(cors());
+
+const getMe = async (req) => {
+  const token = req.headers["x-token"];
+
+  if (token) {
+    try {
+      return await jwt.verify(token, proces.env.SECRET);
+    } catch (e) {
+      throw new AuthenticationError("Your session expired. Sign in again.");
+    }
+  }
+};
 
 //The server has the type definitions, resolvers, and context
 //attached to it. In the example, we provide a hard-types context
@@ -30,11 +43,15 @@ const server = new ApolloServer({
       message,
     };
   },
-  context: async () => ({
-    models,
-    me: await models.User.findByLogin("rwieruch"),
-    secret: process.env.SECRET,
-  }),
+  context: async ({ req }) => {
+    const me = await getMe(req);
+
+    return {
+      models,
+      me,
+      secret: process.env.SECRET,
+    };
+  },
 });
 
 //The middleware makes the api accessible through a /graphql path.
