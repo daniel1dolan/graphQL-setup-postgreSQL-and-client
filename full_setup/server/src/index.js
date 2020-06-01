@@ -16,6 +16,7 @@ app.use(cors());
 
 const getMe = async (req) => {
   const token = req.headers["x-token"];
+  console.log(token);
 
   if (token) {
     try {
@@ -52,6 +53,7 @@ const server = new ApolloServer({
       secret: process.env.SECRET,
     };
   },
+  introspection: true,
 });
 
 //The middleware makes the api accessible through a /graphql path.
@@ -93,6 +95,7 @@ const createUsersWithMessages = async () => {
       username: "ddavids",
       email: "hello@david.com",
       password: "ddavids",
+      role: "ADMIN",
       messages: [
         {
           id: uuidv4(),
