@@ -44,6 +44,7 @@ const server = new ApolloServer({
       message,
     };
   },
+  //Context is provided to every resolver in GraphQL
   context: async ({ req }) => {
     const me = await getMe(req);
 
@@ -53,7 +54,6 @@ const server = new ApolloServer({
       secret: process.env.SECRET,
     };
   },
-  introspection: true,
 });
 
 //The middleware makes the api accessible through a /graphql path.

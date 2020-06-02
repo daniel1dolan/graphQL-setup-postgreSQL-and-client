@@ -54,6 +54,8 @@ module.exports = {
 
       return { token: createToken(user, secret, "30m") };
     },
+    //Combine resolvers allows other repeatedly used resolvers
+    //to be used from a different file along with a separate resolver.
     deleteUser: combineResolvers(
       isAdmin,
       async (parent, { id }, { models }) => {
