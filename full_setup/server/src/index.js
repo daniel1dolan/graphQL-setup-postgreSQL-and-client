@@ -16,7 +16,6 @@ app.use(cors());
 
 const getMe = async (req) => {
   const token = req.headers["x-token"];
-  console.log(token);
 
   if (token) {
     try {
