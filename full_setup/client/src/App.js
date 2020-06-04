@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-function App() {
+const GET_USERS = gql`
+  query {
+    users {
+      id
+      username
+    }
+  }
+`;
+
+function App({ onUserSelected }) {
+  const { loading, error, data } = useQuery(GET_USERS);
+
+  if (loading) return "Loading...";
+  if (error) return `Error! ${error.message}`;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <h3>Select a user:</h3>
+      <select name="users" onChange={onUserSelected}>
+        {data.users.map((user) => {
+          return (
+            <option key={user.id} value={user.username}>
+              {user.username}
+            </option>
+          );
+        })}
+      </select>
+    </>
   );
 }
 
